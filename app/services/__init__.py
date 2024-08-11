@@ -1,0 +1,1 @@
+from .face_analyze_service import face_analyze_service
