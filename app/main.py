@@ -1,11 +1,14 @@
+import os
+import sys
+
 from fastapi import FastAPI
 import uvicorn
-from controllers import image_controller
-
+from controllers import user_face_controller
+sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 app = FastAPI()
 
 # Include the router from the controller module
-app.include_router(image_controller.router, prefix='/face_api/')
+app.include_router(user_face_controller.router, prefix='/face_api/')
 
 
 @app.get("/")
