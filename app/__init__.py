@@ -1,4 +1,4 @@
 # app/__init__.py
-from .services import *
-from .repositories import *
-from .controllers import *
+from app.services import *
+from app.repositories import *
+from app.controllers import *

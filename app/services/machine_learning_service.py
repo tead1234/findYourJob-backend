@@ -1,12 +1,12 @@
 import asyncio
 import os
 
-from entity.face_image import face
+from app.entity.face_image import face
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
 from sklearn.preprocessing import LabelEncoder
-from repositories.face_image_repository import face_image_repository
-from services.face_analysis_service import get_face_landmarks
+from app.repositories.face_image_repository import face_image_repository
+from app.services.face_analysis_service import get_face_landmarks
 import joblib
 import json
 
@@ -71,8 +71,7 @@ class machine_learning_service:
     def received_face_learn(self, received_face: face):
         pass
 
-    def predict(self, received_face):
-
+    def predict(self, landmarks: np.ndarray) -> dict:
         self.model_gender = joblib.load(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'gender_model.pkl'))
         self.model_job1 = joblib.load(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'job1_model.pkl'))
         self.model_job2 = joblib.load(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'job2_model.pkl'))
@@ -80,22 +79,18 @@ class machine_learning_service:
         self.gender_encoder = joblib.load(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'gender_encoder.pkl'))
         self.job_encoder = joblib.load(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'job_encoder.pkl'))
 
-        received_landmarks = get_face_landmarks(received_face)
-
-        landmarks = np.array(received_landmarks).flatten().reshape(1, -1)
-
         # 성별 예측
         gender_pred = self.model_gender.predict(landmarks)
-        gender = self.gender_encoder.inverse_transform(gender_pred)[0]
+        gender = self.gender_encoder.inverse_transform(gender_pred)[0].strip()
 
         # 직업 예측
         job1_pred = self.model_job1.predict(landmarks)
         job2_pred = self.model_job2.predict(landmarks)
         job3_pred = self.model_job3.predict(landmarks)
 
-        job1 = self.job_encoder.inverse_transform(job1_pred)[0]
-        job2 = self.job_encoder.inverse_transform(job2_pred)[0]
-        job3 = self.job_encoder.inverse_transform(job3_pred)[0]
+        job1 = self.job_encoder.inverse_transform(job1_pred)[0].strip()
+        job2 = self.job_encoder.inverse_transform(job2_pred)[0].strip()
+        job3 = self.job_encoder.inverse_transform(job3_pred)[0].strip()
 
         return {
             "predicted_gender": gender,
@@ -105,8 +100,10 @@ class machine_learning_service:
         }
 
 
-predeict_model =  machine_learning_service().predict(r"D:\silde_project_workspace\findYourJob-backend\app\face_samples\example.png")
-print(predeict_model)
+# predeict_model =  machine_learning_service().predict("../face_samples/example.png")
+# # predeict_model
+#
+# print(predeict_model)
 # async def main():
 #
 #     await machine_learning_service().self_learn()

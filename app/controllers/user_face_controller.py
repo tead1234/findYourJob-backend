@@ -1,49 +1,52 @@
 from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi.responses import JSONResponse
 from fastapi.responses import StreamingResponse
 from bson import ObjectId
 import io
 import logging
 from app.services.face_analysis_service import *
+from app.services.machine_learning_service import *
+from app.services.user_interface_service import *
+from io import BytesIO
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
 
+
 @router.post("/upload/")
 async def upload_image(file: UploadFile = File(...)):
+    # 파일이 이미지 검증
+    if not is_image_file(file):
+        raise HTTPException(status_code=400, detail="Uploaded file is not a valid image type")
+
     try:
-        predict()  ## 유저
-        이미지를
-        학습에
-        사용하는걸
-        동의할지
-        말지를
-        알려준다.
-        이미지를
-        분석한
-        정보를
-        db에
-        저장해야.
-        repo에서
-        받아온
-        이미지를
-        학습한
-        face객체를
-        만들어서
-        저장.
-        file_id = await process(file)
-        return {"file_id": str(file_id), "filename": file.filename}
+        file_content = await file.read()
+        file_stream = BytesIO(file_content)
+
+        # 얼굴 랜드마크 추출 및 Numpy 배열 반환
+        landmarks_np = get_face_landmarks(file_stream)
+
+        # 예측 모델 호출
+        prediction_service = machine_learning_service()
+        prediction = prediction_service.predict(landmarks_np)
+
+        prediction["predicted_job1_image"] = encode_image_to_base64(f"ai_images/{prediction['predicted_job1']}.jpg")
+        prediction["predicted_job2_image"] = encode_image_to_base64(f"ai_images/{prediction['predicted_job2']}.jpg")
+        prediction["predicted_job3_image"] = encode_image_to_base64(f"ai_images/{prediction['predicted_job3']}.jpg")
+
+        return JSONResponse(content={"prediction": prediction})
+
     except Exception as e:
-        logger.error(f"Error uploading image: {e}")
         raise HTTPException(status_code=500, detail=str(e))
 
 
-@router.get("/images/{file_id}")
-async def get_image(file_id: str):
-    try:
-
-        return await get_image_service(file_id)
-    except Exception as e:
-        logger.error(f"Error getting image: {e}")
-        raise HTTPException(status_code=404, detail="File not found")
+# @router.get("/images/{file_id}")
+# async def get_image(file_id: str):
+#     try:
+#
+#         return await get_image_service(file_id)
+#     except Exception as e:
+#         logger.error(f"Error getting image: {e}")
+#         raise HTTPException(status_code=404, detail="File not found")
 
 

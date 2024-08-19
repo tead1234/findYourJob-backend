@@ -1,5 +1,5 @@
-from config import *
-from entity.face_image import face
+from ..config import *
+from ..entity.face_image import face
 import json
 
 
