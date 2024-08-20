@@ -10,6 +10,7 @@ from fastapi.responses import StreamingResponse
 from fastapi import HTTPException
 from PIL import Image
 from fastapi import UploadFile
+from typing import List
 
 # 모델 파일 경로
 MODEL_FILE_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'shape_predictor_68_face_landmarks.dat')
@@ -82,5 +83,16 @@ def validate_image(file_content: bytes) -> bool:
         return False
 
 def encode_image_to_base64(image_path):
+    """
+    Decode image to base64
+    """
     with open(image_path, "rb") as image_file:
         return base64.b64encode(image_file.read()).decode('utf-8')
+
+
+def convert_landmarks_to_list(landmarks_np: np.ndarray) -> List[List[List[int]]]:
+    """
+    Change 1D array to 2D array
+    """
+    landmarks_2d = landmarks_np.reshape(-1, 2)
+    return [landmarks_2d.tolist()]
