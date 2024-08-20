@@ -24,7 +24,8 @@ class face_image_repository:
         return face_images
 
     async def save_face_image(self, face_image: face) -> str:
-        result = await self.collection.insert_one(face_image)
+        face_image_insert = face_image.dict()
+        result = await self.collection.insert_one(face_image_insert)
         return str(result.inserted_id)
 
     async def save_face_data_from_json(self, json_path):
