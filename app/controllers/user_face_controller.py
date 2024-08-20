@@ -26,6 +26,8 @@ async def upload_image(file: UploadFile = File(...)):
         # 얼굴 랜드마크 추출 및 Numpy 배열 반환
         landmarks_np = get_face_landmarks(file_stream)
 
+        ## 동의 시 <- entity/face_image 형태로 저장함 함수는 face_image_repository/save_face_image
+
         # 예측 모델 호출
         prediction_service = machine_learning_service()
         prediction = prediction_service.predict(landmarks_np)
