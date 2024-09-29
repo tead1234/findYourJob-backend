@@ -14,7 +14,7 @@ from app.repositories.face_image_repository import *
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
-
+face_image_repo = face_image_repository()
 
 @router.post("/upload/")
 async def upload_image(file: UploadFile = File(...),
@@ -47,8 +47,10 @@ async def upload_image(file: UploadFile = File(...),
                 job2=prediction['predicted_job2'],
                 job3=prediction['predicted_job3']
             )
-            face_image_repo = face_image_repository()
+
             result_id = await face_image_repo.save_face_image(face_image=face_entity)
+
+            train()
             print(f"Saved face image with ID: {result_id}")
 
         prediction["predicted_job1_image"] = f"ai_images/{prediction['predicted_job1']}.jpg"
@@ -60,7 +62,11 @@ async def upload_image(file: UploadFile = File(...),
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-
+def train():
+    picture_number = face_image_repo.get_total_records()
+    if picture_number > 50:
+        machine_learning = machine_learning_service()
+        machine_learning.self_learn()
 # @router.get("/images/{file_id}")
 # async def get_image(file_id: str):
 #     try:
