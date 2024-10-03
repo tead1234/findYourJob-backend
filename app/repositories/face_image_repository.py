@@ -47,3 +47,6 @@ class face_image_repository:
         with open(r"app\id_list", 'w') as f:
             for _id in inserted_ids:
                 f.write(_id + '\n')
+
+    async def get_total_records(self):
+        return await self.collection.count_documents({})
