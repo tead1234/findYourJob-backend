@@ -82,7 +82,7 @@ Poet,시인
 Opera Singer,성악가
 B-Boy,비보이
 Magician,마술사
-Model,모델
+model,모델
 Stuntman,스턴트맨
 MC,엠씨
 Circus Leader,서커스 단장
@@ -95,6 +95,7 @@ Perfumer,조향사
 Female Diver,해녀
 Bank Clerk,은행원
 Loan Shark,사채업자
-Car Dealer,차딜러
+car_dealer,차딜러
 Hair Designer,헤어디자이너
 Hotelier,호텔리어
+insurance_sales_agent,보험판매사
