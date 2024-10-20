@@ -55,6 +55,7 @@ class machine_learning_service:
     async def self_learn(self):
 
         faces = []
+        print("학습 실시")
         cursor = face_image_repository().collection.find()
         async for document in cursor:
             faces.append(face(
