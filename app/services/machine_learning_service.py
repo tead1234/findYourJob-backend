@@ -19,7 +19,7 @@ class machine_learning_service:
         self.model_job1 = RandomForestClassifier()
         self.model_job2 = RandomForestClassifier()
         self.model_job3 = RandomForestClassifier()
-        self.translation_df = pd.read_csv("app/job_100.csv", encoding="cp949")
+        self.translation_df = pd.read_csv("app/job_100_1.csv", encoding="utf-8")
 
     def train_models(self, faces: list[face]):
         landmarks = []
