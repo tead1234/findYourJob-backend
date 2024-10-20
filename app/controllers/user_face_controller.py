@@ -39,6 +39,7 @@ async def upload_image(file: UploadFile = File(...),
 
         # 동의시 학습을 위해 mongodb에 저장
         if consent:
+            print("consent flow")
             face_entity = face(
                 id=str(uuid.uuid4()),             # 랜덤 UUID 생성
                 gender=gender,                  # 파라미터로 받은 gender
