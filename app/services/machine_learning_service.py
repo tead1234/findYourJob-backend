@@ -8,7 +8,7 @@ from sklearn.preprocessing import LabelEncoder
 from app.repositories.face_image_repository import face_image_repository
 from app.services.face_analysis_service import get_face_landmarks
 import joblib
-import json
+import pandas as pd
 
 
 class machine_learning_service:
@@ -19,6 +19,7 @@ class machine_learning_service:
         self.model_job1 = RandomForestClassifier()
         self.model_job2 = RandomForestClassifier()
         self.model_job3 = RandomForestClassifier()
+        self.translation_df = pd.read_csv("app/job_100_1.csv", encoding="utf-8")
 
     def train_models(self, faces: list[face]):
         landmarks = []
@@ -72,6 +73,12 @@ class machine_learning_service:
     def received_face_learn(self, received_face: face):
         pass
 
+    def translate_job(self, job_name):
+        if job_name in self.translation_df['English'].values:
+            return self.translation_df.loc[self.translation_df['English'] == job_name, 'Korean'].values[0]
+        else:
+            return job_name
+
     def predict(self, landmarks: np.ndarray) -> dict:
         self.model_gender = joblib.load(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'gender_model.pkl'))
         self.model_job1 = joblib.load(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'job1_model.pkl'))
@@ -93,11 +100,18 @@ class machine_learning_service:
         job2 = self.job_encoder.inverse_transform(job2_pred)[0].strip()
         job3 = self.job_encoder.inverse_transform(job3_pred)[0].strip()
 
+        job1_korean = self.translate_job(job1)
+        job2_korean = self.translate_job(job2)
+        job3_korean = self.translate_job(job3)
+
         return {
             "predicted_gender": gender,
             "predicted_job1": job1,
             "predicted_job2": job2,
-            "predicted_job3": job3
+            "predicted_job3": job3,
+            "predicted_job1_translated": job1_korean,
+            "predicted_job2_translated": job2_korean,
+            "predicted_job3_translated": job3_korean
         }
 
 

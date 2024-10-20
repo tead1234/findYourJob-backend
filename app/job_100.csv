@@ -1,100 +1,101 @@
 English,Korean
-Doctor,의사
-Teacher,교사
-Engineer,엔지니어
-Lawyer,변호사
-Accountant,회계사
-Nurse,간호사
-Architect,건축가
-Scientist,과학자
-Pharmacist,약사
-Dentist,치과의사
-Chinese Chef,중식 요리사
-Japanese Chef,일식 요리사
-Korean Chef,한식 요리사
-American Chef,양식 요리사
-Firefighter,소방관
-Police officer,경찰관
-Pilot,조종사
-Writer,작가
-Journalist,기자
-Actor,배우
-Musician,음악가
-Photographer,사진사
-Farmer,농부
-Carpenter,목수
-Plumber,배관공
-Mechanic,정비사
-Electrician,전기공
-Veterinarian,수의사
-Scientist,과학자
-Software Developer,소프트웨어 개발자
-Data Analyst,데이터 분석가
-Marketing Manager,마케팅 매니저
-Sales Manager,영업 매니저
-Human Resources Manager,인사 관리자
-Financial Analyst,재무 분석가
-Investment Banker,투자 은행가
-Real Estate Agent,부동산 중개인
-Construction Worker,건설 노동자
-Truck Driver,트럭 운전사
-Taxi Driver,택시 기사
-Bus Driver,버스 기사
-Airline Attendant,항공 승무원
-Receptionist,접수원
-Customer Service Representative,고객 서비스 담당자
-Call Center Operator,콜센터 운영자
-Librarian,사서
-IT Support Specialist,IT 지원 전문가
-Network Administrator,네트워크 관리자
-Database Administrator,데이터베이스 관리자
-Security Guard,경비원
-Cashier,계산원
-Store Manager,매장 관리자
-Chef,요리사
-Wedding Planner,웨딩플래너
-Artist,화가
-Comedian,코미디언
-Streamer,스트리머
-PD,피디
-Ticktocker,틱톡커
-Blogger,블로거
-Cheer Leader,치어리더
-Announcer,아나운서
-Fisher,어부
-Flourist,플로리스트
-Bartender,바텐더
-Building Owner,건물주
-Maid,메이드
-Gambler,도박사
-Public Official,공무원
-President,대통령
-Soldier,군인
-Spy,간첩
-Detective,탐정
-Buddhist Monk,스님
-Prophet,예언가
-Zookeeper,사육사
-Tourist Guide,관광 가이드
-Unemployed,백수
-Waiter,웨이터
-Poet,시인
-Opera Singer,성악가
-B-Boy,비보이
-Magician,마술사
-Model,모델
-Stuntman,스턴트맨
-MC,엠씨
-Circus Leader,서커스 단장
-Racing Driver,레이싱 드라이버
-Professional gammer,프로게이머
-Professional Wrestler,프로레슬러
-Secretary,비서
-Blacksmith,대장장이
-Perfumer,조향사
-Female Diver,해녀
-Bank Clerk,은행원
-Loan Shark,사채업자
-Car Dealer,차딜러
-Hair Designer,헤어디자이너
-Hotelier,호텔리어
+doctor,의사
+teacher,교사
+engineer,엔지니어
+lawyer,변호사
+accountant,회계사
+nurse,간호사
+architect,건축가
+scientist,과학자
+pharmacist,약사
+dentist,치과의사
+chinese_chef,중식 요리사
+japanese_chef,일식 요리사
+korean_chef,한식 요리사
+american_chef,양식 요리사
+firefighter,소방관
+police_officer,경찰관
+pilot,조종사
+writer,작가
+journalist,기자
+actor,배우
+musician,음악가
+photographer,사진사
+farmer,농부
+carpenter,목수
+plumber,배관공
+mechanic,정비사
+electrician,전기공
+veterinarian,수의사
+scientist,과학자
+software_developer,소프트웨어 개발자
+data_analyst,데이터 분석가
+marketing_manager,마케팅 매니저
+sales_manager,영업 매니저
+human_resources_manager,인사 관리자
+financial_analyst,재무 분석가
+investment_banker,투자 은행가
+real_estate_agent,부동산 중개인
+construction_worker,건설 노동자
+truck_driver,트럭 운전사
+taxi_driver,택시 기사
+bus_driver,버스 기사
+airline_attendant,항공 승무원
+receptionist,접수원
+customer_service_representative,고객 서비스 담당자
+call_center_operator,콜센터 운영자
+librarian,사서
+it_support_specialist,IT 지원 전문가
+network_administrator,네트워크 관리자
+database_administrator,데이터베이스 관리자
+security_guard,경비원
+cashier,계산원
+store_manager,매장 관리자
+chef,요리사
+wedding_planner,웨딩플래너
+artist,화가
+comedian,코미디언
+streamer,스트리머
+pd,피디
+ticktocker,틱톡커
+blogger,블로거
+cheer_leader,치어리더
+announcer,아나운서
+fisher,어부
+flourist,플로리스트
+bartender,바텐더
+building_owner,건물주
+maid,메이드
+gambler,도박사
+public_official,공무원
+president,대통령
+soldier,군인
+spy,간첩
+detective,탐정
+buddhist_monk,스님
+prophet,예언가
+zookeeper,사육사
+tourist_guide,관광 가이드
+unemployed,백수
+waiter,웨이터
+poet,시인
+opera_singer,성악가
+b-boy,비보이
+magician,마술사
+model,모델
+stuntman,스턴트맨
+mc,엠씨
+circus_leader,서커스 단장
+racing_driver,레이싱 드라이버
+professional_gammer,프로게이머
+professional_wrestler,프로레슬러
+secretary,비서
+blacksmith,대장장이
+perfumer,조향사
+female_diver,해녀
+bank_clerk,은행원
+loan_shark,사채업자
+car_dealer,차딜러
+hair_designer,헤어디자이너
+hotelier,호텔리어
+insurance_sales_agent,보험판매사
