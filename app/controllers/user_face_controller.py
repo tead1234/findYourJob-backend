@@ -48,6 +48,7 @@ async def upload_image(file: UploadFile = File(...),
                 job2=prediction['predicted_job2_translated'],
                 job3=prediction['predicted_job3_translated']
             )
+            print(job1, job2, job3)
             face_image_repo = face_image_repository()
             result_id = await face_image_repo.save_face_image(face_image=face_entity)
             picture_number = await face_image_repo.get_total_records()
