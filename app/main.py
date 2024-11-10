@@ -16,8 +16,6 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
-
-app.mount("/ai_images", StaticFiles(directory="static/ai_images"), name="ai_images")
 # Include the router from the controller module
 app.include_router(user_face_controller.router, prefix='/face_api')
 static_folder_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ai_images")
@@ -26,7 +24,7 @@ static_folder_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "a
 app.include_router(user_face_controller.router, prefix='/face_api')
 
 # StaticFiles 경로를 절대 경로로 설정합니다.
-app.mount("/static", StaticFiles(directory=static_folder_path), name="static")
+app.mount("/ai_images", StaticFiles(directory=static_folder_path), name="static")
 
 @app.get("/")
 async def root():
