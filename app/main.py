@@ -17,6 +17,7 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+app.mount("/ai_images", StaticFiles(directory="static/ai_images"), name="ai_images")
 # Include the router from the controller module
 app.include_router(user_face_controller.router, prefix='/face_api')
 static_folder_path = os.path.join(os.path.dirname(os.path.abspath(__file__)), "ai_images")
