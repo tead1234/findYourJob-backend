@@ -19,7 +19,7 @@ class machine_learning_service:
         self.model_job1 = RandomForestClassifier()
         self.model_job2 = RandomForestClassifier()
         self.model_job3 = RandomForestClassifier()
-        self.translation_df = pd.read_csv("app/job_100_1.csv", encoding="utf-8")
+        self.translation_df = pd.read_csv("job_100_1.csv", encoding="utf-8")
 
     def train_models(self, faces: list[face]):
         landmarks = []
@@ -106,12 +106,12 @@ class machine_learning_service:
 
         return {
             "predicted_gender": gender,
-            "predicted_job1": job1,
-            "predicted_job2": job2,
-            "predicted_job3": job3,
-            "predicted_job1_translated": job1_korean,
-            "predicted_job2_translated": job2_korean,
-            "predicted_job3_translated": job3_korean
+            "predicted_job1": job1_korean,
+            "predicted_job2": job2_korean,
+            "predicted_job3": job3_korean,
+            "predicted_job1_translated": job1,
+            "predicted_job2_translated": job2,
+            "predicted_job3_translated": job3
         }
 
 

@@ -62,9 +62,9 @@ async def upload_image(file: UploadFile = File(...),
 
             print(f"Saved face image with ID: {result_id}")
 
-        prediction["predicted_job1_image"] = f"ai_images/{prediction['predicted_job1']}.jpg"
-        prediction["predicted_job2_image"] = f"ai_images/{prediction['predicted_job2']}.jpg"
-        prediction["predicted_job3_image"] = f"ai_images/{prediction['predicted_job3']}.jpg"
+        prediction["predicted_job1_image"] = f"ai_images/{prediction['predicted_job1_translated']}.jpg"
+        prediction["predicted_job2_image"] = f"ai_images/{prediction['predicted_job2_translated']}.jpg"
+        prediction["predicted_job3_image"] = f"ai_images/{prediction['predicted_job3_translated']}.jpg"
 
         return JSONResponse(content={"prediction": prediction})
 
