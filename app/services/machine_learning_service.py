@@ -114,14 +114,3 @@ class machine_learning_service:
             "predicted_job3_translated": job3
         }
 
-
-# predeict_model =  machine_learning_service().predict("../face_samples/example.png")
-# # predeict_model
-#
-# print(predeict_model)
-# async def main():
-#
-#     await machine_learning_service().self_learn()
-# # 메인 이벤트 루프에서 실행
-# if __name__ == "__main__":
-#     asyncio.run(main())
