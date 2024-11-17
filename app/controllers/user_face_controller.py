@@ -71,17 +71,7 @@ async def upload_image(file: UploadFile = File(...),
     except Exception as e:
         raise HTTPException(status_code=500, detail=str(e))
 
-# def train():
-#     picture_number = face_image_repo.get_total_records()
-#     if picture_number > 50:
-#         machine_learning = machine_learning_service()
-#         machine_learning.self_learn()
-# @router.get("/images/{file_id}")
-# async def get_image(file_id: str):
-#     try:
-#         return await get_image_service(file_id)
-#     except Exception as e:
-#         logger.error(f"Error getting image: {e}")
-#         raise HTTPException(status_code=404, detail="File not found")
-
-
+@router.get("/secret/")
+async def train():
+    prediction_service = machine_learning_service()
+    prediction_service.self_learn()
