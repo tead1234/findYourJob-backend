@@ -100,8 +100,6 @@ class machine_learning_service:
         job2 = self.job_encoder.inverse_transform(job2_pred)[0].strip()
         job3 = self.job_encoder.inverse_transform(job3_pred)[0].strip()
 
-        print(111, job1, job2, job3)
-
         job1_korean = self.translate_job(job1)
         job2_korean = self.translate_job(job2)
         job3_korean = self.translate_job(job3)
