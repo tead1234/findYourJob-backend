@@ -11,6 +11,7 @@ from app.services.user_interface_service import *
 from app.entity.face_image import face
 from io import BytesIO
 from app.repositories.face_image_repository import *
+import csv
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -75,3 +76,26 @@ async def upload_image(file: UploadFile = File(...),
 async def train():
     prediction_service = machine_learning_service()
     prediction_service.self_learn()
+
+
+# CSV 파일에 데이터를 추가하는 함수
+def add_to_csv(english_word: str, korean_word: str, filename="app/jop_100_1.csv"):
+    file_exists = os.path.exists(filename)
+
+    with open(filename, mode='a', newline='', encoding='utf-8') as file:
+        writer = csv.writer(file)
+        if not file_exists:
+            writer.writerow(["ENGLISH", "KOREAN"])
+        writer.writerow([english_word, korean_word])
+
+
+# POST 요청을 처리하는 엔드포인트
+@router.post("/add_word/")
+async def add_word(word_pair: WordPair):
+    try:
+        add_to_csv(word_pair.english, word_pair.korean)
+        return {"message": f"{word_pair.english} and {word_pair.korean} added!"}
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=str(e))
+
+
