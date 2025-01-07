@@ -68,7 +68,8 @@ class machine_learning_service:
                 job3=document['job3'],
             ))
 
-        self.train_models(faces)
+        loop = asyncio.get_event_loop()
+        await loop.run_in_executor(None, self.train_models, faces)
 
     def received_face_learn(self, received_face: face):
         pass

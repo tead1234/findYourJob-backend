@@ -74,4 +74,4 @@ async def upload_image(file: UploadFile = File(...),
 @router.get("/secret/")
 async def train():
     prediction_service = machine_learning_service()
-    prediction_service.self_learn()
+    await prediction_service.self_learn()
