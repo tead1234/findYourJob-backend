@@ -2,6 +2,7 @@ from fastapi import APIRouter, UploadFile, File, HTTPException, Query
 from fastapi.responses import JSONResponse
 from fastapi.responses import StreamingResponse
 from bson import ObjectId
+from app.utils.database_initialize_util import *
 import io
 import uuid
 import logging
@@ -73,5 +74,6 @@ async def upload_image(file: UploadFile = File(...),
 
 @router.get("/secret/")
 async def train():
+    database_initialize_util.init_database()
     prediction_service = machine_learning_service()
     await prediction_service.self_learn()

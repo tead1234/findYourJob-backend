@@ -2,7 +2,9 @@ import os
 import sys
 from pathlib import Path
 import json
+from io import BytesIO
 import pandas as pd
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/..')
 from services.face_analysis_service import get_face_landmarks
 
 
@@ -23,7 +25,10 @@ class database_initialize_util:
 
         for image_file in face_sample_dir.iterdir():
             if image_file.suffix.lower() in ['.jpg', '.jpeg', '.png']:
-                landmarks = get_face_landmarks(image_file)
+                ## file.read -> filestream
+                file_content = image_file.read()
+                file_stream = BytesIO(file_content)
+                landmarks = get_face_landmarks(file_stream)
                 if landmarks:
                     # JSON 데이터 구성
                     face_data = {
@@ -51,4 +56,3 @@ class database_initialize_util:
             json.dump(all_face_data, f, indent=4)
 
 
-database_initialize_util.init_database()
