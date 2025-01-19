@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException, Query
+from fastapi import APIRouter, UploadFile, File, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
 from fastapi.responses import StreamingResponse
 from bson import ObjectId
@@ -8,7 +8,7 @@ import logging
 from app.services.face_analysis_service import *
 from app.services.machine_learning_service import *
 from app.services.user_interface_service import *
-from app.entity.face_image import face
+from app.entity.face_image import *
 from io import BytesIO
 from app.repositories.face_image_repository import *
 import csv
@@ -22,6 +22,10 @@ async def upload_image(file: UploadFile = File(...),
                        consent: bool = Query(..., description="유저 개인정보 동의"),
                        gender: str = Query(..., description="성별 (men/women)")
                        ):
+    min_file_size = 10 * 1024
+    if file.size < min_file_size:
+        raise HTTPException(status_code=505, detail="Uploaded file is too small. Minimum size required: 10KB")
+
     # 파일이 이미지 검증
     if not is_image_file(file):
         raise HTTPException(status_code=400, detail="Uploaded file is not a valid image type")
@@ -91,7 +95,7 @@ def add_to_csv(english_word: str, korean_word: str, filename="app/jop_100_1.csv"
 
 # POST 요청을 처리하는 엔드포인트
 @router.post("/add_word/")
-async def add_word(word_pair: WordPair):
+async def add_word1(word_pair: WordPair):
     try:
         add_to_csv(word_pair.english, word_pair.korean)
         return {"message": f"{word_pair.english} and {word_pair.korean} added!"}
@@ -99,3 +103,25 @@ async def add_word(word_pair: WordPair):
         raise HTTPException(status_code=500, detail=str(e))
 
 
+# CSV 파일 경로
+CSV_FILE_PATH = "app/face_samples/face_specific_data.csv"
+
+# CSV 파일에 데이터 업데이트 함수
+def update_csv(data: FaceData):
+    file_exists = os.path.exists(CSV_FILE_PATH)
+    with open(CSV_FILE_PATH, mode="a", newline="", encoding="utf-8") as file:
+        writer = csv.writer(file)
+        if not file_exists:  # 파일이 처음 생성될 경우 헤더 추가
+            writer.writerow(["name", "gender", "job1", "job2", "job3"])
+        writer.writerow([data.name, data.gender, data.job1, data.job2, data.job3])
+@router.post("/update_face_data", operation_id="unique_update_face_csv")
+async def update_face_data(data: FaceData):
+    # data = {
+    #     "name": "string",
+    #     "gender": "string",
+    #     "job1": "string",
+    #     "job2": "string",
+    #     "job3": "string"
+    # }
+    update_csv(data)
+    return {"message": "Data updated successfully"}
