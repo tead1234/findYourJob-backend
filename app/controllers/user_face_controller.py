@@ -2,6 +2,7 @@ from fastapi import APIRouter, UploadFile, File, HTTPException, Query, Request
 from fastapi.responses import JSONResponse
 from fastapi.responses import StreamingResponse
 from bson import ObjectId
+from app.utils.database_initialize_util import *
 import io
 import uuid
 import logging
@@ -78,8 +79,9 @@ async def upload_image(file: UploadFile = File(...),
 
 @router.get("/secret/")
 async def train():
+    database_initialize_util.init_database()
     prediction_service = machine_learning_service()
-    prediction_service.self_learn()
+    await prediction_service.self_learn()
 
 
 # CSV 파일에 데이터를 추가하는 함수
@@ -103,11 +105,9 @@ async def add_word1(word_pair: WordPair):
         raise HTTPException(status_code=500, detail=str(e))
 
 
-# CSV 파일 경로
-CSV_FILE_PATH = "app/face_samples/face_specific_data.csv"
-
 # CSV 파일에 데이터 업데이트 함수
 def update_csv(data: FaceData):
+    CSV_FILE_PATH = "app/face_samples/face_specific_data.csv"
     file_exists = os.path.exists(CSV_FILE_PATH)
     with open(CSV_FILE_PATH, mode="a", newline="", encoding="utf-8") as file:
         writer = csv.writer(file)

@@ -68,7 +68,8 @@ class machine_learning_service:
                 job3=document['job3'],
             ))
 
-        self.train_models(faces)
+        loop = asyncio.get_event_loop()
+        await loop.run_in_executor(None, self.train_models, faces)
 
     def received_face_learn(self, received_face: face):
         pass
@@ -99,8 +100,6 @@ class machine_learning_service:
         job1 = self.job_encoder.inverse_transform(job1_pred)[0].strip()
         job2 = self.job_encoder.inverse_transform(job2_pred)[0].strip()
         job3 = self.job_encoder.inverse_transform(job3_pred)[0].strip()
-
-        print(111, job1, job2, job3)
 
         job1_korean = self.translate_job(job1)
         job2_korean = self.translate_job(job2)
