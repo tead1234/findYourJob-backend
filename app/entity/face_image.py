@@ -9,3 +9,15 @@ class face(BaseModel):
     job1: str
     job2: str
     job3: str
+
+class WordPair(BaseModel):
+    english: str
+    korean: str
+
+
+class FaceData(BaseModel):
+    name: str
+    gender: str
+    job1: str
+    job2: str
+    job3: str
