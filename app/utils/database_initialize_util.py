@@ -1,12 +1,11 @@
 import os
 import sys
+sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/..')
 from pathlib import Path
 import json
 from io import BytesIO
 import pandas as pd
-sys.path.append(os.path.dirname(os.path.abspath(__file__)) + '/..')
 from app.services.face_analysis_service import get_face_landmarks
-
 
 class database_initialize_util:
     def __init__(self):
