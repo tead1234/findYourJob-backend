@@ -17,11 +17,9 @@ class database_initialize_util:
         output_dir = Path(r'app')
         output_dir.mkdir(exist_ok=True)
         csv_file = os.path.join(
-        os.path.dirname(
             os.path.dirname(
                 os.path.dirname(os.path.abspath(__file__))
-            )
-        ),
+            ),
         'face_specific_data.csv'
     )
         face_data_df = pd.read_csv(csv_file, header=None, names=["filename", "gender", "job1", "job2", "job3"])
