@@ -1,4 +1,4 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException, Query, Request
+from fastapi import APIRouter, UploadFile, File, HTTPException, Form, Query, Request
 from fastapi.responses import JSONResponse
 from fastapi.responses import StreamingResponse
 from bson import ObjectId
@@ -12,6 +12,7 @@ from app.entity.face_image import *
 from io import BytesIO
 from app.repositories.face_image_repository import *
 import csv
+from typing import Optional
 
 router = APIRouter()
 logger = logging.getLogger(__name__)
@@ -105,6 +106,7 @@ async def add_word1(word_pair: WordPair):
 
 # CSV 파일 경로
 CSV_FILE_PATH = "app/face_samples/face_specific_data.csv"
+IMAGE_SAVE_PATH = "app/face_samples/"
 
 # CSV 파일에 데이터 업데이트 함수
 def update_csv(data: FaceData):
@@ -115,13 +117,23 @@ def update_csv(data: FaceData):
             writer.writerow(["name", "gender", "job1", "job2", "job3"])
         writer.writerow([data.name, data.gender, data.job1, data.job2, data.job3])
 @router.post("/update_face_data", operation_id="unique_update_face_csv")
-async def update_face_data(data: FaceData):
-    # data = {
-    #     "name": "string",
-    #     "gender": "string",
-    #     "job1": "string",
-    #     "job2": "string",
-    #     "job3": "string"
-    # }
+async def update_face_data(
+        name: str = Form(...),
+        gender: str = Form(...),
+        job1: str = Form(...),
+        job2: Optional[str] = Form(None),
+        job3: Optional[str] = Form(None),
+        file: UploadFile = File(...)
+):
+    data = FaceData(name=name, gender=gender, job1=job1, job2=job2, job3=job3)
     update_csv(data)
-    return {"message": "Data updated successfully"}
+
+    # 이미지 저장 경로 설정
+    if not os.path.exists(IMAGE_SAVE_PATH):
+        os.makedirs(IMAGE_SAVE_PATH)
+
+    file_location = os.path.join(IMAGE_SAVE_PATH, f"{name}.jpg")
+    with open(file_location, "wb") as image_file:
+        image_file.write(await file.read())
+
+    return {"message": "Data and image updated successfully", "image_path": file_location}
