@@ -92,14 +92,29 @@ class machine_learning_service:
         gender_pred = self.model_gender.predict(landmarks)
         gender = self.gender_encoder.inverse_transform(gender_pred)[0].strip()
 
-        # 직업 예측
-        job1_pred = self.model_job1.predict(landmarks)
-        job2_pred = self.model_job2.predict(landmarks)
-        job3_pred = self.model_job3.predict(landmarks)
+        # 각 모델의 예측 확률 가져오기
+        job1_probs = self.model_job1.predict_proba(landmarks)[0]
+        job2_probs = self.model_job2.predict_proba(landmarks)[0]
+        job3_probs = self.model_job3.predict_proba(landmarks)[0]
 
-        job1 = self.job_encoder.inverse_transform(job1_pred)[0].strip()
-        job2 = self.job_encoder.inverse_transform(job2_pred)[0].strip()
-        job3 = self.job_encoder.inverse_transform(job3_pred)[0].strip()
+        # 모든 가능한 직업 목록
+        all_jobs = self.job_encoder.classes_
+        
+        # 각 직업의 평균 확률 계산
+        job_probabilities = {}
+        for i, job in enumerate(all_jobs):
+            avg_prob = (job1_probs[i] + job2_probs[i] + job3_probs[i]) / 3
+            job_probabilities[job] = avg_prob
+
+        # 확률이 높은 순서대로 정렬
+        sorted_jobs = sorted(job_probabilities.items(), key=lambda x: x[1], reverse=True)
+        
+        # 상위 3개 직업 선택
+        selected_jobs = [job.strip() for job, _ in sorted_jobs[:3]]
+        
+        job1 = selected_jobs[0]
+        job2 = selected_jobs[1]
+        job3 = selected_jobs[2]
 
         job1_korean = self.translate_job(job1)
         job2_korean = self.translate_job(job2)
