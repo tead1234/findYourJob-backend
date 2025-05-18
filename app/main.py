@@ -25,7 +25,8 @@ ALLOWED_IPS = [
     "127.0.0.1",  # localhost
     "::1",        # localhost IPv6
     "152.53.248.175",  # 허용된 외부 IP
-    # 여기에 추가로 허용할 IP를 넣으세요
+    "15.164.123.236",  # 서버 IP
+    "*"  # 모든 IP 허용 (개발 환경에서만 사용)
 ]
 
 app = FastAPI()
@@ -54,8 +55,9 @@ app.add_middleware(
     CORSMiddleware,
     allow_origins=["*"],
     allow_credentials=True,
-    allow_methods=["*"],
+    allow_methods=["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allow_headers=["*"],
+    expose_headers=["*"]
 )
 # Include the router from the controller module
 app.include_router(user_face_controller.router, prefix='/face_api')
