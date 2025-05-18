@@ -20,6 +20,7 @@ class machine_learning_service:
         self.model_job2 = RandomForestClassifier()
         self.model_job3 = RandomForestClassifier()
         self.translation_df = pd.read_csv("app/job_100_1.csv", encoding="utf-8")
+        self.model_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)))
 
     def train_models(self, faces: list[face]):
         landmarks = []
@@ -46,15 +47,14 @@ class machine_learning_service:
         self.model_job2.fit(X, y_job2)
         self.model_job3.fit(X, y_job3)
 
-        joblib.dump(self.model_gender, 'gender_model.pkl')
-        joblib.dump(self.model_job1, 'job1_model.pkl')
-        joblib.dump(self.model_job2, 'job2_model.pkl')
-        joblib.dump(self.model_job3, 'job3_model.pkl')
-        joblib.dump(self.gender_encoder, 'gender_encoder.pkl')
-        joblib.dump(self.job_encoder, 'job_encoder.pkl')
+        joblib.dump(self.model_gender, os.path.join(self.model_dir, 'gender_model.pkl'))
+        joblib.dump(self.model_job1, os.path.join(self.model_dir, 'job1_model.pkl'))
+        joblib.dump(self.model_job2, os.path.join(self.model_dir, 'job2_model.pkl'))
+        joblib.dump(self.model_job3, os.path.join(self.model_dir, 'job3_model.pkl'))
+        joblib.dump(self.gender_encoder, os.path.join(self.model_dir, 'gender_encoder.pkl'))
+        joblib.dump(self.job_encoder, os.path.join(self.model_dir, 'job_encoder.pkl'))
 
     async def self_learn(self):
-
         faces = []
         print("학습 실시")
         cursor = face_image_repository().collection.find()
@@ -81,12 +81,12 @@ class machine_learning_service:
             return job_name
 
     def predict(self, landmarks: np.ndarray) -> dict:
-        self.model_gender = joblib.load(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'gender_model.pkl'))
-        self.model_job1 = joblib.load(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'job1_model.pkl'))
-        self.model_job2 = joblib.load(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'job2_model.pkl'))
-        self.model_job3 = joblib.load(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'job3_model.pkl'))
-        self.gender_encoder = joblib.load(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'gender_encoder.pkl'))
-        self.job_encoder = joblib.load(os.path.join(os.path.dirname(os.path.abspath(__file__)), 'job_encoder.pkl'))
+        self.model_gender = joblib.load(os.path.join(self.model_dir, 'gender_model.pkl'))
+        self.model_job1 = joblib.load(os.path.join(self.model_dir, 'job1_model.pkl'))
+        self.model_job2 = joblib.load(os.path.join(self.model_dir, 'job2_model.pkl'))
+        self.model_job3 = joblib.load(os.path.join(self.model_dir, 'job3_model.pkl'))
+        self.gender_encoder = joblib.load(os.path.join(self.model_dir, 'gender_encoder.pkl'))
+        self.job_encoder = joblib.load(os.path.join(self.model_dir, 'job_encoder.pkl'))
 
         # 성별 예측
         gender_pred = self.model_gender.predict(landmarks)
