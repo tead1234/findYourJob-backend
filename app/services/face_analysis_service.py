@@ -54,15 +54,22 @@ def save_face_landmarks_db(file, gender, job1, job2, job3):
 
 def get_face_landmarks(file_stream: BytesIO) -> np.ndarray:
     try:
+        # 파일 포인터를 처음으로 되돌리기
+        file_stream.seek(0)
+
         # BytesIO 객체에서 이미지 로드
         file_bytes = np.frombuffer(file_stream.read(), np.uint8)
         logger.debug(f"Loaded file bytes: {len(file_bytes)} bytes")
-        
+
         # PIL을 사용하여 이미지 검증
         try:
             pil_image = Image.open(BytesIO(file_bytes))
             logger.debug(f"PIL Image format: {pil_image.format}, mode: {pil_image.mode}, size: {pil_image.size}")
-            
+
+            # 이미지 포맷 확인
+            if pil_image.format not in ['JPEG', 'PNG']:
+                raise ValueError(f"Unsupported image format: {pil_image.format}")
+
             # 이미지 크기 조정 (너무 큰 이미지 처리)
             max_size = 800
             if max(pil_image.size) > max_size:
@@ -70,21 +77,16 @@ def get_face_landmarks(file_stream: BytesIO) -> np.ndarray:
                 new_size = tuple(int(dim * ratio) for dim in pil_image.size)
                 pil_image = pil_image.resize(new_size, Image.Resampling.LANCZOS)
                 logger.debug(f"Resized image to: {new_size}")
-            
+
             # 이미지를 RGB로 변환
             if pil_image.mode != 'RGB':
                 pil_image = pil_image.convert('RGB')
-                logger.debug(f"Converted image to RGB mode")
-            
-            # PIL 이미지를 numpy 배열로 변환
-            rgb_image = np.array(pil_image)
+                logger.debug("Converted image to RGB mode")
+
+            # PIL 이미지를 numpy 배열로 변환 (dtype 강제)
+            rgb_image = np.array(pil_image).astype(np.uint8)
             logger.debug(f"RGB image shape: {rgb_image.shape}, dtype: {rgb_image.dtype}, min: {rgb_image.min()}, max: {rgb_image.max()}")
-            
-            # 이미지가 올바른 범위에 있는지 확인
-            if rgb_image.max() > 255 or rgb_image.min() < 0:
-                rgb_image = np.clip(rgb_image, 0, 255).astype(np.uint8)
-                logger.debug("Clipped image values to valid range")
-            
+
         except Exception as e:
             logger.error(f"Error loading image with PIL: {str(e)}")
             raise ValueError(f"Invalid image format: {str(e)}")
@@ -104,14 +106,14 @@ def get_face_landmarks(file_stream: BytesIO) -> np.ndarray:
 
         # 얼굴 탐지
         try:
-            # dlib 호환성을 위해 이미지 복사
-            gray_dlib = gray.copy()
+            gray_dlib = gray.copy()  # dlib은 종종 입력 이미지에서 직접 값을 요구함
             faces = detector(gray_dlib)
             logger.debug(f"Number of faces detected: {len(faces)}")
         except Exception as e:
             logger.error(f"Error in face detection: {str(e)}")
             raise ValueError(f"Error detecting faces: {str(e)}")
-        
+
+        # 랜드마크 추출
         landmarks = []
         for face in faces:
             try:
@@ -124,8 +126,10 @@ def get_face_landmarks(file_stream: BytesIO) -> np.ndarray:
         if not landmarks:
             raise ValueError("No faces detected")
 
+        # numpy 배열로 변환 후 반환
         landmarks_np = np.array(landmarks).flatten().reshape(1, -1)
         return landmarks_np
+
     except Exception as e:
         logger.error(f"Error in get_face_landmarks: {str(e)}")
         raise ValueError(f"Error processing image: {str(e)}")
