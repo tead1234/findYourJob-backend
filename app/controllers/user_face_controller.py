@@ -79,9 +79,20 @@ async def upload_image(file: UploadFile = File(...),
 
 @router.get("/secret/")
 async def train():
-    database_initialize_util.init_database()
-    prediction_service = machine_learning_service()
-    await prediction_service.self_learn()
+    try:
+        logger.info("Starting database initialization...")
+        database_initialize_util.init_database()
+        
+        logger.info("Initializing machine learning service...")
+        prediction_service = machine_learning_service()
+        
+        logger.info("Starting self-learning process...")
+        await prediction_service.self_learn()
+        
+        return {"message": "Training completed successfully"}
+    except Exception as e:
+        logger.error(f"Error during training: {str(e)}")
+        raise HTTPException(status_code=500, detail=f"Training failed: {str(e)}")
 
 
 # CSV 파일에 데이터를 추가하는 함수

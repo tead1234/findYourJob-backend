@@ -10,6 +10,8 @@ from app.services.face_analysis_service import get_face_landmarks
 import joblib
 import pandas as pd
 import json
+import uuid
+from io import BytesIO
 
 logger = logging.getLogger(__name__)
 
@@ -134,6 +136,52 @@ class machine_learning_service:
                 job3=document['job3'],
             ))
 
+        if not faces:
+            logger.warning("No face data found in database, using face_samples data")
+            # face_samples 데이터 로드
+            face_sample_dir = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'face_samples')
+            csv_file = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'face_specific_data.csv')
+            
+            try:
+                face_data_df = pd.read_csv(csv_file, header=None, names=["filename", "gender", "job1", "job2", "job3"])
+                
+                for image_file in os.listdir(face_sample_dir):
+                    if image_file.lower().endswith(('.jpg', '.jpeg', '.png')):
+                        try:
+                            # 이미지 파일명에 해당하는 데이터 찾기
+                            filename = os.path.splitext(image_file)[0]
+                            face_info = face_data_df[face_data_df['filename'] == filename]
+                            
+                            if not face_info.empty:
+                                # 이미지에서 랜드마크 추출
+                                image_path = os.path.join(face_sample_dir, image_file)
+                                with open(image_path, 'rb') as f:
+                                    file_stream = BytesIO(f.read())
+                                    landmarks = get_face_landmarks(file_stream)
+                                
+                                if landmarks is not None:
+                                    faces.append(face(
+                                        id=str(uuid.uuid4()),
+                                        gender=face_info['gender'].values[0],
+                                        landmarks=landmarks.flatten().tolist(),
+                                        job1=face_info['job1'].values[0],
+                                        job2=face_info['job2'].values[0],
+                                        job3=face_info['job3'].values[0]
+                                    ))
+                        except Exception as e:
+                            logger.error(f"Error processing {image_file}: {str(e)}")
+                            continue
+                
+                if not faces:
+                    logger.error("No valid face data found in face_samples")
+                    raise ValueError("No valid face data found in face_samples")
+                
+                logger.info(f"Loaded {len(faces)} face images from face_samples")
+            except Exception as e:
+                logger.error(f"Error loading face_samples data: {str(e)}")
+                raise
+
+        logger.info(f"Training with {len(faces)} face images")
         loop = asyncio.get_event_loop()
         await loop.run_in_executor(None, self.train_models, faces)
 
