@@ -56,29 +56,60 @@ def get_face_landmarks(file_stream: BytesIO) -> np.ndarray:
     try:
         # BytesIO 객체에서 이미지 로드
         file_bytes = np.frombuffer(file_stream.read(), np.uint8)
+        logger.debug(f"Loaded file bytes: {len(file_bytes)} bytes")
         
         # PIL을 사용하여 이미지 검증
         try:
             pil_image = Image.open(BytesIO(file_bytes))
+            logger.debug(f"PIL Image format: {pil_image.format}, mode: {pil_image.mode}, size: {pil_image.size}")
+            
             # 이미지를 RGB로 변환
             if pil_image.mode != 'RGB':
                 pil_image = pil_image.convert('RGB')
+                logger.debug(f"Converted image to RGB mode")
+            
             # PIL 이미지를 numpy 배열로 변환
             rgb_image = np.array(pil_image)
+            logger.debug(f"RGB image shape: {rgb_image.shape}, dtype: {rgb_image.dtype}, min: {rgb_image.min()}, max: {rgb_image.max()}")
+            
+            # 이미지가 올바른 범위에 있는지 확인
+            if rgb_image.max() > 255 or rgb_image.min() < 0:
+                rgb_image = np.clip(rgb_image, 0, 255).astype(np.uint8)
+                logger.debug("Clipped image values to valid range")
+            
         except Exception as e:
             logger.error(f"Error loading image with PIL: {str(e)}")
             raise ValueError(f"Invalid image format: {str(e)}")
 
         # RGB에서 그레이스케일로 변환
-        gray = cv2.cvtColor(rgb_image, cv2.COLOR_RGB2GRAY)
+        try:
+            gray = cv2.cvtColor(rgb_image, cv2.COLOR_RGB2GRAY)
+            logger.debug(f"Grayscale image shape: {gray.shape}, dtype: {gray.dtype}, min: {gray.min()}, max: {gray.max()}")
+        except Exception as e:
+            logger.error(f"Error converting to grayscale: {str(e)}")
+            raise ValueError(f"Error converting image to grayscale: {str(e)}")
+
+        # 이미지가 8비트인지 확인
+        if gray.dtype != np.uint8:
+            gray = gray.astype(np.uint8)
+            logger.debug("Converted image to uint8")
 
         # 얼굴 탐지
-        faces = detector(gray)
+        try:
+            faces = detector(gray)
+            logger.debug(f"Number of faces detected: {len(faces)}")
+        except Exception as e:
+            logger.error(f"Error in face detection: {str(e)}")
+            raise ValueError(f"Error detecting faces: {str(e)}")
+        
         landmarks = []
-
         for face in faces:
-            shape = predictor(gray, face)
-            landmarks.append([(point.x, point.y) for point in shape.parts()])
+            try:
+                shape = predictor(gray, face)
+                landmarks.append([(point.x, point.y) for point in shape.parts()])
+            except Exception as e:
+                logger.error(f"Error getting landmarks for face: {str(e)}")
+                continue
 
         if not landmarks:
             raise ValueError("No faces detected")
