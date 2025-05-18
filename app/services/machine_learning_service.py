@@ -91,6 +91,9 @@ class machine_learning_service:
             raise
 
     def train_models(self, faces: list[face]):
+        if not faces:
+            raise ValueError("No face data available for training")
+
         landmarks = []
         genders = []
         jobs1 = []
@@ -105,11 +108,16 @@ class machine_learning_service:
             jobs3.append(f.job3)
 
         X = np.array(landmarks)
+        if len(X.shape) == 1:
+            X = X.reshape(1, -1)
+        
         y_gender = self.gender_encoder.fit_transform(genders)
         y_job1 = self.job_encoder.fit_transform(jobs1)
         y_job2 = self.job_encoder.fit_transform(jobs2)
         y_job3 = self.job_encoder.fit_transform(jobs3)
 
+        logger.info(f"Training data shape: X={X.shape}, y_gender={y_gender.shape}")
+        
         self.model_gender.fit(X, y_gender)
         self.model_job1.fit(X, y_job1)
         self.model_job2.fit(X, y_job2)
@@ -159,7 +167,7 @@ class machine_learning_service:
                                     file_stream = BytesIO(f.read())
                                     landmarks = get_face_landmarks(file_stream)
                                 
-                                if landmarks is not None:
+                                if landmarks is not None and len(landmarks) > 0:
                                     faces.append(face(
                                         id=str(uuid.uuid4()),
                                         gender=face_info['gender'].values[0],
