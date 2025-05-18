@@ -106,8 +106,10 @@ def get_face_landmarks(file_stream: BytesIO) -> np.ndarray:
 
         # 얼굴 탐지
         try:
-            gray_dlib = gray.copy()  # dlib은 종종 입력 이미지에서 직접 값을 요구함
+            # 얼굴 탐지 전에 이미지 배열을 contiguous 하게 복사
+            gray_dlib = np.ascontiguousarray(gray.copy())
             faces = detector(gray_dlib)
+
             logger.debug(f"Number of faces detected: {len(faces)}")
         except Exception as e:
             logger.error(f"Error in face detection: {str(e)}")
