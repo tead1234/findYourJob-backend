@@ -63,6 +63,14 @@ def get_face_landmarks(file_stream: BytesIO) -> np.ndarray:
             pil_image = Image.open(BytesIO(file_bytes))
             logger.debug(f"PIL Image format: {pil_image.format}, mode: {pil_image.mode}, size: {pil_image.size}")
             
+            # 이미지 크기 조정 (너무 큰 이미지 처리)
+            max_size = 800
+            if max(pil_image.size) > max_size:
+                ratio = max_size / max(pil_image.size)
+                new_size = tuple(int(dim * ratio) for dim in pil_image.size)
+                pil_image = pil_image.resize(new_size, Image.Resampling.LANCZOS)
+                logger.debug(f"Resized image to: {new_size}")
+            
             # 이미지를 RGB로 변환
             if pil_image.mode != 'RGB':
                 pil_image = pil_image.convert('RGB')
@@ -96,7 +104,9 @@ def get_face_landmarks(file_stream: BytesIO) -> np.ndarray:
 
         # 얼굴 탐지
         try:
-            faces = detector(gray)
+            # dlib 호환성을 위해 이미지 복사
+            gray_dlib = gray.copy()
+            faces = detector(gray_dlib)
             logger.debug(f"Number of faces detected: {len(faces)}")
         except Exception as e:
             logger.error(f"Error in face detection: {str(e)}")
@@ -105,7 +115,7 @@ def get_face_landmarks(file_stream: BytesIO) -> np.ndarray:
         landmarks = []
         for face in faces:
             try:
-                shape = predictor(gray, face)
+                shape = predictor(gray_dlib, face)
                 landmarks.append([(point.x, point.y) for point in shape.parts()])
             except Exception as e:
                 logger.error(f"Error getting landmarks for face: {str(e)}")
