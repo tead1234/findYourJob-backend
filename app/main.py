@@ -1,6 +1,8 @@
 import os
 import sys
+
 import logging
+
 from fastapi import FastAPI, Request, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 import uvicorn
@@ -8,7 +10,7 @@ from app.controllers import user_face_controller
 from fastapi.staticfiles import StaticFiles
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-# 로깅 설정
+
 logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s - %(name)s - %(levelname)s - %(message)s',
@@ -19,6 +21,7 @@ logging.basicConfig(
 )
 
 logger = logging.getLogger(__name__)
+
 
 # 허용된 IP 목록
 ALLOWED_IPS = [
@@ -41,7 +44,7 @@ async def ip_restriction_middleware(request: Request, call_next):
     response = await call_next(request)
     return response
 
-# 에러 핸들링 미들웨어
+
 @app.middleware("http")
 async def error_handling_middleware(request: Request, call_next):
     try:
