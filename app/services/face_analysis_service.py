@@ -1,14 +1,16 @@
 import os
 import sys
-
+import logging
 import dlib
 import cv2
 import io
-
+from PIL import Image
 from ..repositories import face_image_repository
 from ..entity.face_image import *
 import numpy as np
 from io import BytesIO
+
+logger = logging.getLogger(__name__)
 
 MODEL_FILE_PATH = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'shape_predictor_68_face_landmarks.dat')
 detector = dlib.get_frontal_face_detector()
@@ -51,26 +53,38 @@ def save_face_landmarks_db(file, gender, job1, job2, job3):
 #     return landmarks
 
 def get_face_landmarks(file_stream: BytesIO) -> np.ndarray:
-    # BytesIO 객체에서 이미지 로드
-    file_bytes = np.frombuffer(file_stream.read(), np.uint8)
-    load_image = cv2.imdecode(file_bytes, cv2.IMREAD_COLOR)
+    try:
+        # BytesIO 객체에서 이미지 로드
+        file_bytes = np.frombuffer(file_stream.read(), np.uint8)
+        
+        # PIL을 사용하여 이미지 검증
+        try:
+            pil_image = Image.open(BytesIO(file_bytes))
+            # 이미지를 RGB로 변환
+            if pil_image.mode != 'RGB':
+                pil_image = pil_image.convert('RGB')
+            # PIL 이미지를 numpy 배열로 변환
+            rgb_image = np.array(pil_image)
+        except Exception as e:
+            logger.error(f"Error loading image with PIL: {str(e)}")
+            raise ValueError(f"Invalid image format: {str(e)}")
 
-    if load_image is None:
-        raise ValueError("Unable to decode image from file bytes")
+        # RGB에서 그레이스케일로 변환
+        gray = cv2.cvtColor(rgb_image, cv2.COLOR_RGB2GRAY)
 
-    # 그레이스케일로 변환
-    gray = cv2.cvtColor(load_image, cv2.COLOR_BGR2GRAY)
+        # 얼굴 탐지
+        faces = detector(gray)
+        landmarks = []
 
-    # 얼굴 탐지
-    faces = detector(gray)
-    landmarks = []
+        for face in faces:
+            shape = predictor(gray, face)
+            landmarks.append([(point.x, point.y) for point in shape.parts()])
 
-    for face in faces:
-        shape = predictor(gray, face)
-        landmarks.append([(point.x, point.y) for point in shape.parts()])
+        if not landmarks:
+            raise ValueError("No faces detected")
 
-    if not landmarks:
-        raise ValueError("No faces detected")
-
-    landmarks_np = np.array(landmarks).flatten().reshape(1, -1)
-    return landmarks_np
+        landmarks_np = np.array(landmarks).flatten().reshape(1, -1)
+        return landmarks_np
+    except Exception as e:
+        logger.error(f"Error in get_face_landmarks: {str(e)}")
+        raise ValueError(f"Error processing image: {str(e)}")
