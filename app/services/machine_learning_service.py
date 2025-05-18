@@ -1,6 +1,6 @@
 import asyncio
 import os
-
+import logging
 from app.entity.face_image import face
 import numpy as np
 from sklearn.ensemble import RandomForestClassifier
@@ -9,7 +9,9 @@ from app.repositories.face_image_repository import face_image_repository
 from app.services.face_analysis_service import get_face_landmarks
 import joblib
 import pandas as pd
+import json
 
+logger = logging.getLogger(__name__)
 
 class machine_learning_service:
     def __init__(self):
@@ -21,6 +23,70 @@ class machine_learning_service:
         self.model_job3 = RandomForestClassifier()
         self.translation_df = pd.read_csv("app/job_100_1.csv", encoding="utf-8")
         self.model_dir = os.path.join(os.path.dirname(os.path.abspath(__file__)))
+        
+        # 모델 파일이 없으면 초기 모델 생성
+        if not self._check_model_files():
+            self._create_initial_models()
+
+    def _check_model_files(self):
+        """모델 파일들이 존재하는지 확인"""
+        required_files = [
+            'gender_model.pkl',
+            'job1_model.pkl',
+            'job2_model.pkl',
+            'job3_model.pkl',
+            'gender_encoder.pkl',
+            'job_encoder.pkl'
+        ]
+        return all(os.path.exists(os.path.join(self.model_dir, f)) for f in required_files)
+
+    def _create_initial_models(self):
+        """초기 모델 생성"""
+        try:
+            logger.info("Creating initial models...")
+            # init_landmark_data.json에서 초기 데이터 로드
+            init_data_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), 'init_landmark_data.json')
+            with open(init_data_path, 'r') as f:
+                init_data = json.load(f)
+
+            # 데이터 준비
+            landmarks = []
+            genders = []
+            jobs1 = []
+            jobs2 = []
+            jobs3 = []
+
+            for face_data in init_data.values():
+                landmarks.append(np.array(face_data['landmarks']).flatten())
+                genders.append(face_data['gender'])
+                jobs1.append(face_data['job1'])
+                jobs2.append(face_data['job2'])
+                jobs3.append(face_data['job3'])
+
+            X = np.array(landmarks)
+            y_gender = self.gender_encoder.fit_transform(genders)
+            y_job1 = self.job_encoder.fit_transform(jobs1)
+            y_job2 = self.job_encoder.fit_transform(jobs2)
+            y_job3 = self.job_encoder.fit_transform(jobs3)
+
+            # 모델 학습
+            self.model_gender.fit(X, y_gender)
+            self.model_job1.fit(X, y_job1)
+            self.model_job2.fit(X, y_job2)
+            self.model_job3.fit(X, y_job3)
+
+            # 모델 저장
+            joblib.dump(self.model_gender, os.path.join(self.model_dir, 'gender_model.pkl'))
+            joblib.dump(self.model_job1, os.path.join(self.model_dir, 'job1_model.pkl'))
+            joblib.dump(self.model_job2, os.path.join(self.model_dir, 'job2_model.pkl'))
+            joblib.dump(self.model_job3, os.path.join(self.model_dir, 'job3_model.pkl'))
+            joblib.dump(self.gender_encoder, os.path.join(self.model_dir, 'gender_encoder.pkl'))
+            joblib.dump(self.job_encoder, os.path.join(self.model_dir, 'job_encoder.pkl'))
+            
+            logger.info("Initial models created successfully")
+        except Exception as e:
+            logger.error(f"Error creating initial models: {str(e)}")
+            raise
 
     def train_models(self, faces: list[face]):
         landmarks = []
